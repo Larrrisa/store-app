@@ -1,10 +1,49 @@
+"use client";
+
 import Image from "next/image";
 import sets from "/public/sets.png";
 import cross from "/public/cross.svg";
 import share from "/public/share.svg";
 import arrow_grey from "/public/arrow_grey.svg";
+import { useState, useEffect } from "react";
 
 export default function BasketPage() {
+  const [items, setItems] = useState([]);
+  const [amount, setAmount] = useState(1);
+
+  async function getData() {
+    try {
+      const url = `https://fakestoreapi.com/products/3`;
+      const response = await fetch(url);
+      const res = await response.json();
+      setItems(res);
+      console.log(res);
+    } catch (error) {
+      console.log("ERROR", error);
+      throw new Error("Failed to fetch data");
+    }
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  function priceWithDiscount(item) {
+    const discount = item - item * 0.2;
+    return discount;
+  }
+
+  function handleDicreaseAmount() {
+    setAmount(amount - 1);
+    if (amount === 0) {
+      setAmount(0);
+    }
+  }
+
+  function handleIncreaseAmount() {
+    setAmount(amount + 1);
+  }
+
   return (
     <div>
       <div className="text-sm font-normal rounded-xl w-101 h-7 bg-green-btn py-1 px-3.5 text-font-black mx-48 mb-3.5">
@@ -12,16 +51,23 @@ export default function BasketPage() {
       </div>
       <div className="flex mx-48 gap-x-50px">
         <div className="text-font-black flex flex-col mb-8 ">
-          <div className="flex  justify-between border-t-2 border-solid pt-5 mb-8">
+          <div
+            className="flex  justify-between border-t-2 border-solid pt-5 mb-8"
+            key={items.id}
+          >
             <div className="flex items-center">
               <input type="checkbox" className="w-6 h-6 mr-5"></input>
             </div>
-            <Image src={sets} width={97} height={102} className="mr-5" />
+            <Image
+              src={items.image}
+              width={97}
+              height={102}
+              className="mr-5"
+              alt={items.title}
+            />
             <div className="mr-20">
               <p className=" text-sm">Товар:</p>
-              <p className="font-bold mb-2.5">
-                Боди без рукавов "ФРУК-ТИК", розовый
-              </p>
+              <p className="font-bold mb-2.5">{items.title}</p>
               <div className="flex gap-x-5">
                 <p>Скидка: 20%</p>
                 <p>Размер: 74</p>
@@ -29,111 +75,47 @@ export default function BasketPage() {
             </div>
             <div className="mr-100px">
               <p className=" text-sm">Цена:</p>
-              <p className="font-bold ">349₽</p>
-              <p className="text-sm line-through">500₽</p>
+              <p className="font-bold ">
+                {Math.round(priceWithDiscount(items.price))}₽
+              </p>
+              <p className="text-sm line-through">{Math.round(items.price)}₽</p>
             </div>
             <div className="mr-100px">
               <p className=" text-sm">Кол-во:</p>
               <div className="flex gap-x-5">
-                <span className="border border-font-black px-2">-</span>
-                <p className="font-bold">1</p>
-                <span className="px-2 bg-amber-400 text-white font-bold">
+                <span
+                  className="border border-font-black px-2"
+                  onClick={handleDicreaseAmount}
+                >
+                  -
+                </span>
+                <p className="font-bold">{amount}</p>
+                <span
+                  className="px-2 bg-amber-400 text-white font-bold"
+                  onClick={handleIncreaseAmount}
+                >
                   +
                 </span>
               </div>
             </div>
             <div className="mr-20">
               <p className=" text-sm">В сумме:</p>
-              <p className="font-bold">2 332₽</p>
-              <p className=" text-sm line-through">3 312₽</p>
-              <p className="text-xs font-font-light-gray">Экономия 1370₽</p>
+              <p className="font-bold">
+                {Math.round(priceWithDiscount(items.price) * amount)}₽
+              </p>
+              <p className=" text-sm line-through">
+                {Math.round(items.price * amount)}₽
+              </p>
+              <p className="text-xs font-font-light-gray">
+                Экономия
+                {Math.round(
+                  (items.price - priceWithDiscount(items.price)) * amount
+                )}
+                ₽
+              </p>
             </div>
             <div className="flex items-center">
               <Image src={cross} />
-            </div>
-          </div>
-          <div className="text-font-black flex justify-between">
-            <div className="flex  justify-between border-t-2 border-solid pt-5 mb-8">
-              <div className="flex items-center">
-                <input type="checkbox" className="w-6 h-6 mr-5"></input>
-              </div>
-              <Image src={sets} width={97} height={102} className="mr-5" />
-              <div className="mr-20">
-                <p className=" text-sm">Товар:</p>
-                <p className="font-bold mb-2.5">
-                  Боди без рукавов "ФРУК-ТИК", розовый
-                </p>
-                <div className="flex gap-x-5">
-                  <p>Скидка: 20%</p>
-                  <p>Размер: 74</p>
-                </div>
-              </div>
-              <div className="mr-100px">
-                <p className=" text-sm">Цена:</p>
-                <p className="font-bold ">349₽</p>
-                <p className="text-sm line-through">500₽</p>
-              </div>
-              <div className="mr-100px">
-                <p className=" text-sm">Кол-во:</p>
-                <div className="flex gap-x-5">
-                  <span className="border border-font-black px-2">-</span>
-                  <p className="font-bold">1</p>
-                  <span className="px-2 bg-amber-400 text-white font-bold">
-                    +
-                  </span>
-                </div>
-              </div>
-              <div className="mr-20">
-                <p className=" text-sm">В сумме:</p>
-                <p className="font-bold">2 332₽</p>
-                <p className=" text-sm line-through">3 312₽</p>
-                <p className="text-xs font-font-light-gray">Экономия 1370₽</p>
-              </div>
-              <div className="flex items-center">
-                <Image src={cross} />
-              </div>
-            </div>
-          </div>
-          <div className="text-font-black flex justify-between">
-            <div className="flex  justify-between border-t-2 border-b-2  border-solid pt-5 pb-5 mb-8">
-              <div className="flex items-center">
-                <input type="checkbox" className="w-6 h-6 mr-5"></input>
-              </div>
-              <Image src={sets} width={97} height={102} className="mr-5" />
-              <div className="mr-20">
-                <p className=" text-sm">Товар:</p>
-                <p className="font-bold mb-2.5">
-                  Боди без рукавов "ФРУК-ТИК", розовый
-                </p>
-                <div className="flex gap-x-5">
-                  <p>Скидка: 20%</p>
-                  <p>Размер: 74</p>
-                </div>
-              </div>
-              <div className="mr-100px">
-                <p className=" text-sm">Цена:</p>
-                <p className="font-bold ">349₽</p>
-                <p className="text-sm line-through">500₽</p>
-              </div>
-              <div className="mr-100px">
-                <p className=" text-sm">Кол-во:</p>
-                <div className="flex gap-x-5">
-                  <span className="border border-font-black px-2">-</span>
-                  <p className="font-bold">1</p>
-                  <span className="px-2 bg-amber-400 text-white font-bold">
-                    +
-                  </span>
-                </div>
-              </div>
-              <div className="mr-20">
-                <p className=" text-sm">В сумме:</p>
-                <p className="font-bold">2 332₽</p>
-                <p className=" text-sm line-through">3 312₽</p>
-                <p className="text-xs font-font-light-gray">Экономия 1370₽</p>
-              </div>
-              <div className="flex items-center">
-                <Image src={cross} />
-              </div>
             </div>
           </div>
         </div>

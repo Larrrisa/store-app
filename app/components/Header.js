@@ -198,7 +198,14 @@ export default function Header() {
           </div>
           <div>
             <Image src={basket} width={36} height={30} className="mr-28 mb-1" />
-            <Link href="basket">Корзина</Link>
+            <Link
+              href={{
+                pathname: "/basket",
+                query: { basket },
+              }}
+            >
+              Корзина
+            </Link>
           </div>
           <div>
             <Image src={account} width={29} height={29} className="mb-1" />

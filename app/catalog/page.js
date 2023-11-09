@@ -18,7 +18,6 @@ export default function CatalogPage() {
       const response = await fetch(url);
       const res = await response.json();
       setProducts(res);
-      console.log(res);
     } catch (error) {
       console.log("ERROR", error);
       throw new Error("Failed to fetch data");
@@ -29,8 +28,11 @@ export default function CatalogPage() {
     getData();
   }, []);
 
-  function handlePutItemInBasket() {
-    setBasket();
+  function handlePutItemInBasket(id, e) {
+    if (e.target.id === id) {
+      setBasket([...basket, { id: e.target.id }]);
+    }
+    console.log(basket);
   }
 
   return (
@@ -150,7 +152,8 @@ export default function CatalogPage() {
                 <div className="flex justify-center">
                   <button
                     className="text-xs uppercase text-white bg-amber-400 py-3.5 px-14 rounded-full"
-                    onClick={() => handlePutItemInBasket()}
+                    id={item.id}
+                    onClick={(e) => handlePutItemInBasket(item.id, e)}
                   >
                     В корзину
                   </button>
